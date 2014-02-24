@@ -1,0 +1,63 @@
+#!/usr/bin/python
+
+infile='GDS4577_full.soft.txt'# Type in your dataset name.
+
+fh = open(infile) # Opens the file.
+
+line= fh.readline() # Reads the first line.
+while line[:20] != '!dataset_table_begin': # Checks the first 20 charachters until it reaches line dataset_table_begin.
+    line=fh.readline()
+
+header= fh.readline().strip() # Strip cuts of the enter charachter at the end.
+colnames={} # Dictionary for handling columns and contents. 
+
+index=0
+for title in header.split('\t'): # Each column will have a number given to starting from 0.
+    colnames[title]=index
+    print '%s\t%s'%(title,index) # Checking the dictionary.
+    index=index+1 # Dictionary colnames was filled up with each colnames and indexes.
+
+
+
+#open our output files, one per table.
+genefile=open('genes.txt', 'w')
+expressionfile=open('expression.txt','w')
+probefile=open('probes.txt', 'w')
+# All 3 output files have been created.
+
+genefields=['Gene ID', 'Gene symbol', 'Gene title'] # Title of interest.
+samples=header.split('\t')[2:int(colnames['Gene title'])] # Checking which column has gene title.
+probefields=['ID_REF','Gene ID'] # Tables of interest with only 2 columns.
+
+def buildrow(row, fields):
+    newrow=[]
+    for f in fields:
+        newrow.append(row[int(colnames[f])])
+    return "\t".join(newrow)+"\n"
+
+def build_expression(row, samples):
+    exprrows=[]
+    for s in samples:
+        newrow=[s,]
+	newrow.append(row[int(colnames['ID_REF'])])
+	newrow.append(row[int(colnames[s])])
+	exprrows.append("\t".join(newrow))
+    return "\n".join(exprrows)+"\n"# This function returns a tab delimited line containing the elements belonging to the fields.
+rows=0    
+for line in fh.readlines(): # The first line contains the first data to the table.
+    try:
+        if line[0]=='!':
+            continue # It reads on the file. Row to row.
+        row=line.strip().split('\t') # The list row contains each data as an element.
+        genefile.write(buildrow(row, genefields)) # Here we call the function buildrow in the same line.
+        probefile.write(buildrow(row,probefields)) # Here we call the function buildrow in the same line.
+        expressionfile.write(build_expression(row, samples)) # Here we call the build_expression function.	
+	rows=rows+1
+    except:
+	pass
+genefile.close()
+probefile.close()
+expressionfile.close()
+
+print '%s rows processed'%rows # Prints the number of processed rows.
+    

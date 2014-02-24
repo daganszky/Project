@@ -1,0 +1,29 @@
+# The creation of a table will be demonstrated in this text file.
+# This is an example on how all 4 tables have been created during this project.
+# This is example will include the synthax which enables of the filling up of the empty tables.
+
+mysql -u yourusername -p yourusername
+
+mysql> create table gene ( #the empty table gene will be created with ... 
+    -> gene_id varchar (50) not null, # ... these columns added.
+    -> gene_title varchar (50) not null, # varchar(50) means that the text of the gene_title in this case can be maximum 50 charachters.
+    -> gene_description varchar (50) not null
+) ;
+
+mysql> alter table gene
+    -> add primary key (gene_id) # primary key added.
+
+mysql> load data local infile 'genes.txt' into table gene # all the content from the file genes.txt will be put into the table called gene.
+
+# Another example is shown here.
+
+mysql> create table experiment ( # In this case table experiment is the same as table sample.
+    -> samle_name varchar(50) not null,
+    -> protocol enum ('Control', 'Dlx5_overexpression') not null
+) ;
+
+mysql> alter table experiment
+    -> add primary key (sample_name)
+
+myswl> load data local infile 'samples.txt' into table experiment (sample_name, protocol)
+

@@ -1,0 +1,49 @@
+# In this file comments will be shown on how this models.py CGI script works.
+
+'''Classes to represent our gene expression objects'''
+
+import MySQLdb # This is a class.
+
+class DBHandler():
+    connection=None
+    dbname='mydatabase'
+    dbuser='dbusername'
+    dbpassword='dbpassword'
+    
+    def __init__(self):
+        if DBHandler.connection == None:
+            DBHandler.connection = MySQLdb.connect(db=DBHandler.dbname, \ # connecting to the database. DBHandler.connection = is a field not a method however MYSQLdb.connect() is a method and what is inside the () are the parameters.
+user=DBHandler.dbuser, passwd=DBHandler.dbpassword)
+
+    def cursor(self): # This is a method of the DBHandler object. Methods are in ().
+	return DBHandler.connection.cursor()
+
+class Gene(): # Class gene created with the fields of the following below.
+    gene_symbol=''
+    gene_title=''
+    gene_id=''
+    probelist=[]
+
+    def __init__(self,geneid):
+	self.gene_id=geneid
+        db=DBHandler() # db becomes a DBHandler type object.At this point is def_init_(self) initialised. This is the point when it connects to the GEO dataset.
+	cursor=db.cursor() # Same applies here.
+	sql='select gene_title, gene_symbol from gene where gene_id=%s'
+	cursor.execute(sql,(geneid,))
+	# Query database.
+	# Get result and populate the class fields.
+	result=cursor.fetchone() # The result of the ran query (output) will be shown in the result.
+	self.gene_title	=result[0] # The first element of the row will be gene title.
+        self.gene_symbol=result[1] # The second element of the row will be gene symbol.
+        # Now fetching the probes.
+        probesql='select probeid from probe where geneid=%s'
+	# Fill in the blanks. 
+
+
+	for result in cursor.fetchall(): # Displays all the rows, a list from mysql dataset.
+  	    self.probelist.append(result[0]) # Then is stored in the probelist.
+
+    def get_expression(self,experiment):
+
+genetry = Gene("") 
+print genetry.probe_list 
